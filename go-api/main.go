@@ -1,6 +1,8 @@
 package main
 
 import (
+	"embed"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -10,25 +12,21 @@ import (
 	"github.com/eliastarin/ssp2-southpark/go-api/ports"
 )
 
+//go:embed web/*
+var webFS embed.FS
+
 func buildPublisher() ports.MessagePublisher {
 	amqpURL := os.Getenv("AMQP_URL")
 	queue := os.Getenv("AMQP_QUEUE")
 	if queue == "" {
 		queue = "southpark_messages"
 	}
-
-	if amqpURL != "" {
-		pub, err := adapters.NewRabbitPublisher(amqpURL, queue)
-		if err == nil {
-			log.Printf("RabbitMQ publisher connected: %s queue=%s", amqpURL, queue)
-			return pub
-		}
-		log.Printf("RabbitMQ unavailable (%v). Falling back to memory publisher.", err)
-	} else {
-		log.Printf("AMQP_URL not set; using memory publisher.")
+	pub, err := adapters.NewRabbitPublisher(amqpURL, queue)
+	if err != nil {
+		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
 	}
-
-	return adapters.NewMemoryPublisher()
+	log.Printf("RabbitMQ publisher connected: %s queue=%s", amqpURL, queue)
+	return pub
 }
 
 func main() {
@@ -38,8 +36,10 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", h.Health)
 	mux.HandleFunc("/messages", h.PostMessage)
-	// WEB FILES
-	//mux.Handle("/", http.FileServer(http.Dir("./web")))
+
+	// Serve embedded /web (strip the "web/" prefix)
+	sub, _ := fs.Sub(webFS, "web")
+	mux.Handle("/", http.FileServer(http.FS(sub)))
 
 	addr := ":8080"
 	log.Printf("go-api listening on %s", addr)

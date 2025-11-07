@@ -1,31 +1,50 @@
-
 services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+    networks: [southpark]
 
   go-api:
-    build: ./go-api
+    build:
+      context: ./go-api
     container_name: go-api
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       AMQP_URL: amqp://guest:guest@rabbitmq:5672/
       AMQP_QUEUE: southpark_messages
     ports:
-      - "8080:8080"
+      - "8080:8080"    # Web UI + API
+    restart: unless-stopped
+    networks: [southpark]
 
   python-consumer:
-    build: ./python-consumer
+    build:
+      context: ./python-consumer
     container_name: python-consumer
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       AMQP_URL: amqp://guest:guest@rabbitmq:5672/
       AMQP_QUEUE: southpark_messages
+      PYTHONUNBUFFERED: "1"
+    restart: unless-stopped
+    networks: [southpark]
+
+networks:
+  southpark:
+    driver: bridge

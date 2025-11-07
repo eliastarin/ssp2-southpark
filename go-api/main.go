@@ -37,7 +37,7 @@ func main() {
 	mux.HandleFunc("/health", h.Health)
 	mux.HandleFunc("/messages", h.PostMessage)
 
-	// Serve embedded /web (strip the "web/" prefix)
+	// Web app
 	sub, _ := fs.Sub(webFS, "web")
 	mux.Handle("/", http.FileServer(http.FS(sub)))
 

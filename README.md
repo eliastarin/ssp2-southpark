@@ -26,7 +26,7 @@ This system is composed of three services:
 2. Wait until the logs show `go-api listening on :8080`. RabbitMQ and the consumer need a few extra seconds on the first run.
 3. Confirm the API is healthy:
    ```bash
-   curl http://localhost:8080/health
+   http://localhost:8080/health
    ```
 4. Open the web UI in a browser: http://localhost:8080  
    - Pick a character, type a quote, then hit **Send** (or turn on **Auto** to stream random generated quotes).  

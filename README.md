@@ -1,7 +1,7 @@
 # South Park Messenger
 
 A distributed system built with **Go**, **RabbitMQ**, and **Python**, following a hexagonal architecure approach.  
-The project demonstrates message publishing, queueing, and consuming in a fun way — featuring quotes from South Park characters 🎭.
+The project demonstrates message publishing, queueing and consuming in a fun way - featuring quotes from South Park characters.
 
 ---
 
@@ -11,9 +11,9 @@ This system is composed of three services:
 
 | Service | Description | Port |
 |----------|--------------|------|
-| 🟣 **Go API Service** | Exposes a REST endpoint `/messages` that accepts JSON and publishes messages to a RabbitMQ queue (`southpark_messages`). Also serves the modern web UI. | 8080 |
-| 🟢 **RabbitMQ Broker** | Message broker that stores messages until consumed. Includes a management UI. | 5672 (AMQP), 15672 (Management UI) |
-| 🐍 **Python Consumer** | Listens to the same queue and prints received messages to the console. | – |
+| **Go API Service** | Exposes a REST endpoint `/messages` that accepts JSON and publishes messages to a RabbitMQ queue (`southpark_messages`). Also serves the modern web UI. | 8080 |
+| 🐰 **RabbitMQ Broker** | Message broker that stores messages until consumed. Includes a management UI. | 5672 (AMQP) |
+| 🐍 **Python Consumer** | Listens to the same queue and prints received messages to the console. | N/A |
 
 ---
 
@@ -29,8 +29,8 @@ This system is composed of three services:
    curl http://localhost:8080/health
    ```
 4. Open the web UI in a browser: http://localhost:8080  
-   - Pick a character, type a quote, then hit **Send** (or turn on **Auto** to stream random quotes).  
-   - Each message hits the Go API, which publishes to RabbitMQ, and the Python consumer prints the payload to its logs.
+   - Pick a character, type a quote, then hit **Send** (or turn on **Auto** to stream random generated quotes).  
+   - Each message hits the Go API, which publishes to RabbitMQ and the Python consumer prints it to its logs.
 5. Watch processed messages (optional):
    ```bash
    docker compose logs -f python-consumer

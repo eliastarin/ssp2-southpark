@@ -2,8 +2,9 @@
 
 ## Services
 - **go-api**: HTTP API (Hexagonal Architecture) – will publish to RabbitMQ
-- **python-consumer**: consumes messages from RabbitMQ and logs them
 - **rabbitmq**: message broker (ports: 5672, 15672 UI)
+- **python-consumer**: consumes messages from RabbitMQ and logs them
+
 
 ## Quick start
 

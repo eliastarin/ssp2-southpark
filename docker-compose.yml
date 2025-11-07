@@ -1,12 +1,11 @@
-version: "3.9"
 
 services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"     # AMQP
-      - "15672:15672"   # Management UI
+      - "5672:5672"
+      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -17,7 +16,8 @@ services:
     depends_on:
       - rabbitmq
     environment:
-      AMQP_URL: amqp://guest:guest@rabbitmq:5672/     # used later by adapter
+      AMQP_URL: amqp://guest:guest@rabbitmq:5672/
+      AMQP_QUEUE: southpark_messages
     ports:
       - "8080:8080"
 
@@ -28,3 +28,4 @@ services:
       - rabbitmq
     environment:
       AMQP_URL: amqp://guest:guest@rabbitmq:5672/
+      AMQP_QUEUE: southpark_messages

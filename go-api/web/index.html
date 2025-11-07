@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>South Park Messenger</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; }
+    h1 { margin-bottom: 0.25rem }
+    .card { max-width: 720px; padding: 1rem 1.25rem; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.06);}
+    label { display:block; font-weight:600; margin:.75rem 0 .25rem; }
+    input, textarea, select, button { font-size: 16px; padding:.6rem .7rem; border:1px solid #ddd; border-radius:10px; width:100%;}
+    button { width:auto; cursor:pointer; }
+    .row { display:flex; gap:.7rem; flex-wrap:wrap; }
+    .row > * { flex:1; min-width: 180px;}
+    .muted { color:#777; font-size:.9rem; }
+    .log { margin-top:1rem; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; max-height: 300px; overflow:auto; background:#fafafa; border:1px solid #eee; border-radius: 10px; padding:.75rem;}
+    .ok { color: #0a7a2f; }
+    .err { color: #b00020; }
+  </style>
+</head>
+<body>
+  <h1>South Park Messenger</h1>
+  <p class="muted">Send messages to the Go API → RabbitMQ → Python consumer.</p>
+
+  <div class="card">
+    <div class="row">
+      <div>
+        <label for="author">Author</label>
+        <select id="author">
+          <option>Cartman</option>
+          <option>Stan</option>
+          <option>Kyle</option>
+          <option>Kenny</option>
+          <option>Butters</option>
+          <option>Randy</option>
+        </select>
+      </div>
+      <div>
+        <label for="body">Message</label>
+        <input id="body" placeholder="Respect my authoritah!" />
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:.9rem">
+      <button id="sendBtn">Send once</button>
+      <button id="autoBtn">▶ Start auto (2s)</button>
+      <button id="stopBtn" disabled>⏸ Stop auto</button>
+    </div>
+
+    <p class="muted" style="margin:.8rem 0 0">
+      Endpoint: <code>/messages</code>
+    </p>
+
+    <div class="log" id="log"></div>
+  </div>
+
+  <script>
+    const quotes = [
+      ["Cartman", "Respect my authoritah!"],
+      ["Stan", "Oh my God, they killed Kenny!"],
+      ["Kyle", "Dude, seriously?"],
+      ["Kenny", "mmph mmph mmmph!"],
+      ["Butters", "Oh hamburgers…"],
+      ["Randy", "I thought this was America!"]
+    ];
+
+    const $ = (id) => document.getElementById(id);
+    const log = (msg, ok=true) => {
+      const el = document.createElement('div');
+      el.className = ok ? 'ok' : 'err';
+      el.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      $("log").prepend(el);
+    };
+
+    async function send(author, body) {
+      try {
+        const res = await fetch("/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ author, body })
+        });
+        const data = await res.json().catch(()=> ({}));
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        log(`${author} → "${body}" (${data.status || "queued"})`, true);
+      } catch (e) {
+        log(`ERROR sending: ${e.message}`, false);
+      }
+    }
+
+    $("sendBtn").onclick = () => {
+      const author = $("author").value;
+      const body = $("body").value || "Respect my authoritah!";
+      send(author, body);
+    };
+
+    let timer = null;
+    $("autoBtn").onclick = () => {
+      if (timer) return;
+      $("autoBtn").disabled = true;
+      $("stopBtn").disabled = false;
+      timer = setInterval(() => {
+        const [a, b] = quotes[Math.floor(Math.random() * quotes.length)];
+        $("author").value = a;
+        $("body").value = b;
+        send(a, b);
+      }, 2000);
+    };
+    $("stopBtn").onclick = () => {
+      clearInterval(timer); timer = null;
+      $("autoBtn").disabled = false;
+      $("stopBtn").disabled = true;
+    };
+  </script>
+</body>
+</html>

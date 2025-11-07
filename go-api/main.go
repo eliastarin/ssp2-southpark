@@ -38,6 +38,8 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", h.Health)
 	mux.HandleFunc("/messages", h.PostMessage)
+	// WEB FILES
+	//mux.Handle("/", http.FileServer(http.Dir("./web")))
 
 	addr := ":8080"
 	log.Printf("go-api listening on %s", addr)

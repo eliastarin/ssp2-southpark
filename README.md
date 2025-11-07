@@ -35,6 +35,11 @@ This system is composed of three services:
    ```bash
    docker compose logs -f python-consumer
    ```
+6. Access the RabbitMQ Management Dashboard (optional): http://localhost:15672/#/
+    - **Username:** `guest`  
+    - **Password:** `guest`  
+    - Here you can monitor queues, connections, message flow, and exchange activity.
+    
 ### Stopping / cleaning up
 - Stop containers: press `Ctrl+C` in the compose session or run `docker compose down`.
 - Remove containers/images/network when done:

@@ -12,7 +12,7 @@
   const line = document.createElement("div");
   line.className = `line ${palette[type] || ""}`;
 
-  // Clean up unwanted text
+  // Clean up the text
   msg = msg.replace(/\(queued\)/gi, "").trim();
 
   // Time formatting — only hours and minutes

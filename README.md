@@ -12,7 +12,7 @@ This system is composed of three services:
 | Service | Description | Port |
 |----------|--------------|------|
 | **Go API Service** | Exposes a REST endpoint `/messages` that accepts JSON and publishes messages to a RabbitMQ queue (`southpark_messages`). Also serves the modern web UI. | 8080 |
-| 🐰 **RabbitMQ Broker** | Message broker that stores messages until consumed. Includes a management UI. | 5672 (AMQP) |
+| 🐰 **RabbitMQ Broker** | Message broker that stores messages until consumed. Includes a management UI. | 15672 (AMQP) |
 | 🐍 **Python Consumer** | Listens to the same queue and prints received messages to the console. | N/A |
 
 ---
@@ -39,7 +39,7 @@ This system is composed of three services:
     - **Username:** `guest`  
     - **Password:** `guest`  
     - Here you can monitor queues, connections, message flow, and exchange activity.
-    
+
 ### Stopping / cleaning up
 - Stop containers: press `Ctrl+C` in the compose session or run `docker compose down`.
 - Remove containers/images/network when done:
